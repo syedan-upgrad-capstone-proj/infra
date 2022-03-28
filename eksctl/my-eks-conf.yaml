@@ -89,6 +89,23 @@ nodeGroups: # Refer: https://github.com/weaveworks/eksctl/blob/main/examples/05-
         - t2.medium
     desiredCapacity: 1
     minSize: 0
-    maxSize: 1
+    maxSize: 3
+    subnets:
+      - my-public-201-a
+  - name: node-app
+    labels: { role: workers }
+    taints: 
+      - key: special
+        value: "true"
+        effect: NoSchedule
+    tags:
+      k8s.io/cluster-autoscaler/enabled: "true"
+      k8s.io/cluster-autoscaler/my-eks-201: "shared"
+    instancesDistribution:
+      instanceTypes:
+        - t2.medium
+    desiredCapacity: 1
+    minSize: 0
+    maxSize: 5
     subnets:
       - my-public-201-a
