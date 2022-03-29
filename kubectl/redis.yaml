@@ -72,3 +72,21 @@ spec:
   resources:
     requests:
       storage: 500Mi
+
+
+---
+# REDIS SERVICE
+apiVersion: v1
+kind: Service
+metadata:
+  name: redis-server
+  namespace: demo
+  labels:
+    application: redis-server
+spec:
+  clusterIP: None
+  ports:
+  - port: 6379
+    targetPort: 6379
+  selector:
+    application: redis-server
