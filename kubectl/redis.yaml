@@ -1,0 +1,56 @@
+# redis StatefulSet
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: redis-server
+  namespace: demo
+spec:
+  serviceName: "redis-server"
+  replicas: 1
+  selector:
+    matchLabels:
+      application: redis-server
+  template:
+    metadata:
+      labels:
+        application: redis-server
+    spec:
+      containers:
+      - name: redis-server
+        image: redis:6.2.6-alpine
+        command:
+          - redis-server
+          - "/redis-master/redis.conf"
+        ports:
+        - name: redis-server
+          containerPort: 6379
+        volumeMounts:
+        - mountPath: /redis-master-data
+          name: data
+        - mountPath: /redis-master
+          name: config
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+      volumes:
+        - name: data
+          emptyDir: {}
+        - name: config
+          configMap:
+            name: example-redis-config
+            items:
+            - key: redis-config
+              path: redis.conf
+    
+---
+# ConfigMap
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: example-redis-config
+data:
+  redis-config: |
+    dir /var/lib/redis
+    appendonly yes
+    protected-mode no
