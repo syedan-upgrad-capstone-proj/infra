@@ -21,6 +21,13 @@ spec:
         image: 969361958776.dkr.ecr.us-east-1.amazonaws.com/101-docker-images
         ports:
           - containerPort: 8081
+        resources:
+          limits:
+            cpu: 200m
+            memory: 200Mi
+          requests:
+            cpu: 200m
+            memory: 200Mi
       imagePullSecrets:
           - name: regcred
       tolerations:
