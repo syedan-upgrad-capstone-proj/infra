@@ -25,8 +25,8 @@ spec:
         - name: redis-server
           containerPort: 6379
         volumeMounts:
-        - mountPath: /redis-master-data
-          name: data
+        - mountPath: "/var/lib/data"
+          name: redis-data
         - mountPath: /redis-master
           name: config
         resources:
@@ -34,8 +34,10 @@ spec:
             cpu: 200m
             memory: 200Mi
       volumes:
-        - name: data
-          emptyDir: {}
+        - name: redis-data
+          persistentVolumeClaim:
+            claimName: redis-data
+
         - name: config
           configMap:
             name: example-redis-config
@@ -49,8 +51,24 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: example-redis-config
+  namespace: demo
 data:
   redis-config: |
-    dir /var/lib/redis
+    dir /var/lib/data
     appendonly yes
     protected-mode no
+
+
+---
+# Persistent volume claim
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: redis-data
+  namespace: demo
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 500Mi
